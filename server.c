@@ -93,6 +93,7 @@ pthread_t dc_server_run(const struct dc_server_config *config, struct dc_server_
     int                          result;
 
     env = malloc(sizeof(struct dc_server_environment));
+    env->common.name  = "Server";
     env->config       = config;
     env->lifecycle    = lifecycle;
     env->server_fd    = server_fd;
