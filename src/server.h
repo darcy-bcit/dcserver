@@ -9,11 +9,21 @@
 
 
 struct dc_server_environment;
-struct dc_server_lifecycle;
 
 
-typedef bool (*connection_handler)(int client_fd, const struct dc_server_config *config, void *data);
 typedef int (*dc_server_lifecycle_func)(struct dc_server_environment *env);
+typedef bool (*connection_handler)(int client_fd, const struct dc_server_config *config, void *data);
+
+
+struct dc_server_lifecycle
+{
+    dc_server_lifecycle_func init;
+    dc_server_lifecycle_func bind;
+    dc_server_lifecycle_func listen;
+    dc_server_lifecycle_func accept;
+    dc_server_lifecycle_func error;
+    struct timeval *timeout;
+};
 
 
 typedef enum

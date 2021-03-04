@@ -8,17 +8,6 @@
 #include <errno.h>
 
 
-struct dc_server_lifecycle
-{
-    dc_server_lifecycle_func init;
-    dc_server_lifecycle_func bind;
-    dc_server_lifecycle_func listen;
-    dc_server_lifecycle_func accept;
-    dc_server_lifecycle_func error;
-    struct timeval *timeout;
-};
-
-
 struct dc_server_environment
 {
     struct dc_fsm_environment common;
@@ -58,9 +47,9 @@ struct dc_server_lifecycle *dc_server_lifecycle_create(Lifecycle type,
     struct dc_server_lifecycle *lifecycle;
 
     lifecycle = malloc(sizeof(struct dc_server_lifecycle));
-    lifecycle->init            = server_init;
-    lifecycle->bind            = server_bind;
-    lifecycle->listen          = server_listen;
+    lifecycle->init   = server_init;
+    lifecycle->bind   = server_bind;
+    lifecycle->listen = server_listen;
 
         lifecycle->timeout = timeout;
 
