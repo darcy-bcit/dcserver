@@ -1,3 +1,20 @@
+/*
+ * Copyright 2021 D'Arcy Smith + the BCIT CST Datacommunications Option students.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+
 #include "server.h"
 #include "sys/socket.h"
 #include <stdio.h>
@@ -42,16 +59,16 @@ static int server_error(struct dc_server_environment *env);
 
 
 struct dc_server_lifecycle *dc_server_lifecycle_create(Lifecycle type,
-                                                       struct timeval *timeout)
+                                                           struct timeval *timeout)
 {
     struct dc_server_lifecycle *lifecycle;
 
     lifecycle = malloc(sizeof(struct dc_server_lifecycle));
-    lifecycle->init   = server_init;
-    lifecycle->bind   = server_bind;
-    lifecycle->listen = server_listen;
-
-        lifecycle->timeout = timeout;
+    lifecycle->timeout = timeout;
+    lifecycle->init    = server_init;
+    lifecycle->bind    = server_bind;
+    lifecycle->listen  = server_listen;
+    lifecycle->error   = server_error;
 
     if(type == SEQUENTIAL)
     {
@@ -61,8 +78,6 @@ struct dc_server_lifecycle *dc_server_lifecycle_create(Lifecycle type,
     {
         lifecycle->accept = server_accept_select;
     }
-
-    lifecycle->error  = server_error;
 
     return lifecycle;
 }
@@ -74,7 +89,11 @@ void dc_server_lifecycle_destroy(struct dc_server_lifecycle **plifecycle)
     *plifecycle = NULL;
 }
 
-pthread_t dc_server_run(const struct dc_server_config *config, struct dc_server_lifecycle *lifecycle, int server_fd, connection_handler handler, void *data)
+pthread_t dc_server_run(const struct dc_server_config *config,
+                        struct dc_server_lifecycle *lifecycle,
+                        int server_fd,
+                        connection_handler handler,
+                        void *data)
 {
     pthread_t                    thread;
     pthread_attr_t               attr;
@@ -280,7 +299,7 @@ static int server_error(struct dc_server_environment *env)
     // strlen is the length of the system message
     // 1 is null +
     str = malloc(1 + strlen(message) + 3 + 1);
-    sprintf(str, "%d - %s", env->common.current_state_id, str);
+    sprintf(str, "%d - %s", env->common.from_state_id, str);
     perror(str);
 
     return FSM_EXIT;
